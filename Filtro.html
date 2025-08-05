@@ -1,8 +1,9 @@
 <!DOCTYPE html><html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Filtro Aghatta XV</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -13,81 +14,75 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #000;
-      position: relative;
-      font-family: sans-serif;
+      background: linear-gradient(135deg, #000428, #004e92);
+      font-family: 'Cinzel Decorative', cursive;
     }
-    #camera {
+    video, canvas, #moldura {
       position: absolute;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      z-index: 1;
     }
-    #overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 2;
+    #moldura {
       pointer-events: none;
+      z-index: 2;
     }
-    #fotoBtn {
+    #botao {
       position: absolute;
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 3;
-      padding: 10px 20px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      background: royalblue;
-      color: white;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid gold;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #2c3e50;
       cursor: pointer;
+      z-index: 3;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: all 0.3s ease-in-out;
     }
-    canvas {
-      display: none;
+    #botao:hover {
+      background: gold;
+      color: white;
+      transform: translateX(-50%) scale(1.05);
     }
   </style>
 </head>
 <body>
-  <video id="camera" autoplay playsinline></video>
-  <img id="overlay" src="A_celebratory_digital_design_frame_for_Aghatta's_X.png" alt="Moldura Aghatta XV">
-  <button id="fotoBtn">📸 Tirar Foto</button>
-  <canvas id="canvas"></canvas>  <script>
-    const video = document.getElementById('camera');
+  <video id="video" autoplay playsinline></video>
+  <img id="moldura" src="moldura.png" alt="Moldura Aghatta XV" />
+  <canvas id="canvas" style="display:none;"></canvas>
+  <button id="botao">📸 Tirar Foto</button>  <script>
+    const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
-    const overlay = document.getElementById('overlay');
-    const btn = document.getElementById('fotoBtn');
+    const botao = document.getElementById('botao');
+    const moldura = document.getElementById('moldura');
 
-    // Acessar câmera
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+    navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
         video.srcObject = stream;
-      })
-      .catch(err => {
-        alert('Erro ao acessar a câmera: ' + err);
       });
 
-    btn.addEventListener('click', () => {
-      const width = video.videoWidth;
-      const height = video.videoHeight;
+    botao.addEventListener('click', () => {
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      canvas.width = width;
-      canvas.height = height;
-
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, width, height);
-      ctx.drawImage(overlay, 0, 0, width, height);
-
-      const link = document.createElement('a');
-      link.download = 'AghattaXV_foto.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      const img = new Image();
+      img.src = moldura.src;
+      img.onload = () => {
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const link = document.createElement('a');
+        link.download = 'foto_aghatta.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      }
     });
   </script></body>
 </html>
