@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Filtro Aghatta XV</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+      position: relative;
+      font-family: sans-serif;
+    }
+    #camera {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 1;
+    }
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+    }
+    #fotoBtn {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: royalblue;
+      color: white;
+      cursor: pointer;
+    }
+    canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <video id="camera" autoplay playsinline></video>
+  <img id="overlay" src="A_celebratory_digital_design_frame_for_Aghatta's_X.png" alt="Moldura Aghatta XV">
+  <button id="fotoBtn">📸 Tirar Foto</button>
+  <canvas id="canvas"></canvas>  <script>
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('canvas');
+    const overlay = document.getElementById('overlay');
+    const btn = document.getElementById('fotoBtn');
+
+    // Acessar câmera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        alert('Erro ao acessar a câmera: ' + err);
+      });
+
+    btn.addEventListener('click', () => {
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, width, height);
+      ctx.drawImage(overlay, 0, 0, width, height);
+
+      const link = document.createElement('a');
+      link.download = 'AghattaXV_foto.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  </script></body>
+</html>
