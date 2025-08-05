@@ -48,7 +48,7 @@
       transform: translateX(-50%);
       display: flex;
       flex-direction: row;
-      gap: 12px;
+      gap: 10px;
       z-index: 3;
       padding: 10px;
       flex-wrap: nowrap;
@@ -63,10 +63,10 @@
       background-color: #3544a7;
       color: white;
       border: none;
-      width: 100px;
-      height: 100px;
-      border-radius: 20px;
-      font-size: 14px;
+      width: 80px;
+      height: 80px;
+      border-radius: 15px;
+      font-size: 12px;
       font-weight: bold;
       box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       cursor: pointer;
@@ -87,8 +87,8 @@
     }
 
     .botao span {
-      font-size: 30px;
-      margin-bottom: 6px;
+      font-size: 20px;
+      margin-bottom: 4px;
     }
 
     /* Modal */
@@ -133,6 +133,40 @@
 
     #fechar-modal:hover {
       background: #ff2e2e;
+    }
+
+    .foto-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .foto-wrapper img {
+      display: block;
+    }
+
+    .foto-wrapper .excluir,
+    .foto-wrapper .compartilhar {
+      position: absolute;
+      top: 5px;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      color: white;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .foto-wrapper .excluir {
+      right: 5px;
+    }
+
+    .foto-wrapper .compartilhar {
+      left: 5px;
+    }
+
+    .foto-wrapper button:hover {
+      background: rgba(255, 255, 255, 0.2);
     }
   </style>
 </head>
@@ -241,7 +275,7 @@
       img.onload = () => {
         context.drawImage(img, 0, 0, canvas.width, canvas.height);
         const imagemURL = canvas.toDataURL('image/png');
-        fotos.push(imagemURL); // salva na lista local
+        fotos.push(imagemURL);
         const link = document.createElement('a');
         link.href = imagemURL;
         link.download = 'foto_aghatta_xv.png';
@@ -258,15 +292,55 @@
     function abrirGaleria() {
       const container = document.getElementById('fotosContainer');
       container.innerHTML = '';
+
       if (fotos.length === 0) {
         container.innerHTML = '<p style="color:white; font-size:18px;">Nenhuma foto tirada ainda 😢</p>';
       } else {
-        fotos.forEach(foto => {
+        fotos.forEach((foto, index) => {
+          const wrapper = document.createElement('div');
+          wrapper.classList.add('foto-wrapper');
+
           const img = document.createElement('img');
           img.src = foto;
-          container.appendChild(img);
+
+          const btnExcluir = document.createElement('button');
+          btnExcluir.innerText = '❌';
+          btnExcluir.className = 'excluir';
+          btnExcluir.onclick = () => {
+            if (confirm("Tem certeza que deseja excluir esta foto?")) {
+              fotos.splice(index, 1);
+              abrirGaleria(); // recarrega a galeria
+            }
+          };
+
+          const btnCompartilhar = document.createElement('button');
+          btnCompartilhar.innerText = '📤';
+          btnCompartilhar.className = 'compartilhar';
+          btnCompartilhar.onclick = async () => {
+            if (navigator.share) {
+              try {
+                const blob = await (await fetch(foto)).blob();
+                const file = new File([blob], "foto_aghatta.png", { type: blob.type });
+                await navigator.share({
+                  files: [file],
+                  title: "Foto Aghatta XV",
+                  text: "Veja essa foto linda! 💖"
+                });
+              } catch (err) {
+                alert("Erro ao compartilhar: " + err);
+              }
+            } else {
+              alert("Compartilhamento não suportado neste navegador.");
+            }
+          };
+
+          wrapper.appendChild(img);
+          wrapper.appendChild(btnExcluir);
+          wrapper.appendChild(btnCompartilhar);
+          container.appendChild(wrapper);
         });
       }
+
       document.getElementById('galeria-modal').style.display = 'block';
     }
 
