@@ -24,9 +24,10 @@
       object-fit: cover;
       z-index: 1;
 
-      /* Remove acinzentado */
-      filter: saturate(1) brightness(1);
+      filter: none !important;
       background: transparent;
+      will-change: transform;
+      transform: translateZ(0);
     }
 
     #moldura {
