@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,13 +6,13 @@
   <title>Aghatta faz XV - Foto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       margin: 0;
       background: #000;
-      font-family: 'Segoe UI', sans-serif;
       overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
     }
 
     #camera-container {
@@ -22,12 +23,11 @@
 
     video#video {
       position: absolute;
-      top: 24%;
-      left: 9%;
-      width: 82%;
-      height: 53%;
-      object-fit: cover;
-      border-radius: 15px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
       z-index: 1;
     }
 
@@ -43,34 +43,38 @@
     }
 
     .botoes {
-      position: fixed;
-      bottom: 10px;
-      left: 0;
-      width: 100%;
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      z-index: 4;
-      padding: 10px;
+      flex-direction: row;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      z-index: 3;
+      padding: 0 10px;
     }
 
     button {
-      width: 90%;
-      max-width: 300px;
-      background-color: #3B5BFF;
+      background-color: #3544a7;
       color: white;
       border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 17px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 15px;
       font-weight: bold;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
       cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #4b5fe2;
     }
 
     button:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
     }
   </style>
 </head>
@@ -127,25 +131,30 @@
     }
 
     function tirarFoto() {
+      const videoAspectRatio = video.videoWidth / video.videoHeight;
       const canvas = document.createElement('canvas');
-      const width = video.videoWidth;
-      const height = video.videoHeight;
-
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = 1080;
+      canvas.height = 1920;
       const context = canvas.getContext('2d');
 
-      // Desenha o vídeo
-      context.drawImage(video, 0, 0, width, height);
+      let drawWidth = canvas.width;
+      let drawHeight = canvas.width / videoAspectRatio;
+      if (drawHeight > canvas.height) {
+        drawHeight = canvas.height;
+        drawWidth = canvas.height * videoAspectRatio;
+      }
+      const offsetX = (canvas.width - drawWidth) / 2;
+      const offsetY = (canvas.height - drawHeight) / 2;
 
-      // Desenha a moldura por cima
+      context.fillStyle = "#000";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+
       const molduraAtual = molduras[indexMoldura];
       const img = new Image();
       img.src = molduraAtual.src;
       img.onload = () => {
-        context.drawImage(img, 0, 0, width, height);
-
-        // Salva a imagem
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
         const imagemURL = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = imagemURL;
