@@ -1,170 +1,166 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Foto com Moldura</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aghatta XV - Moldura</title>
   <style>
-    body {
+    * {
       margin: 0;
-      font-family: sans-serif;
-      background: #000;
-      overflow-x: hidden;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    #container {
-      position: relative;
+    body, html {
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+      background: #000;
+    }
+
+    #camera-container {
+      position: fixed;
+      top: 0; left: 0;
       width: 100vw;
       height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      z-index: 1;
     }
 
     video {
       width: 100%;
-      height: auto;
-      max-height: 100vh;
+      height: 100%;
       object-fit: cover;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
     }
 
     #moldura {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      max-height: 100vh;
-      z-index: 2;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
       pointer-events: none;
+      z-index: 2;
     }
 
     #botoes {
-      position: absolute;
-      bottom: 10px;
-      width: 100%;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      justify-content: space-around;
+      gap: 10px;
       z-index: 3;
     }
 
     button {
-      background: #fff;
-      border: none;
-      border-radius: 10px;
       padding: 10px 16px;
-      font-size: 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: none;
+      background-color: #004aad;
+      color: white;
       font-weight: bold;
-      box-shadow: 0 0 10px #0008;
+    }
+
+    .moldura-mini {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border: 2px solid white;
+      border-radius: 8px;
       cursor: pointer;
     }
 
-    #molduras {
-      position: absolute;
+    #molduras-disponiveis {
+      position: fixed;
       top: 10px;
       left: 10px;
       display: flex;
       gap: 10px;
       z-index: 4;
     }
-
-    .opcao-moldura {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border: 2px solid white;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 0 5px #000;
-    }
-
-    canvas {
-      display: none;
-    }
   </style>
 </head>
 <body>
-  <div id="container">
+  <div id="camera-container">
     <video id="video" autoplay playsinline></video>
-    <img id="moldura" src="moldura.png" alt="Moldura" />
-    
-    <div id="molduras">
-      <img src="moldura.png" class="opcao-moldura" onclick="trocarMoldura('moldura.png')" />
-      <img src="moldura2.png" class="opcao-moldura" onclick="trocarMoldura('moldura2.png')" />
-      <img src="moldura3.png" class="opcao-moldura" onclick="trocarMoldura('moldura3.png')" />
-    </div>
-
-    <div id="botoes">
-      <button onclick="tirarFoto()">📸 Tirar Foto</button>
-      <button onclick="trocarCamera()">🔄 Trocar Câmera</button>
-    </div>
-
-    <canvas id="canvas"></canvas>
   </div>
 
+  <img id="moldura" src="moldura.png" alt="Moldura">
+
+  <div id="molduras-disponiveis">
+    <img src="moldura.png" class="moldura-mini" onclick="trocarMoldura('moldura.png')">
+    <img src="moldura2.png" class="moldura-mini" onclick="trocarMoldura('moldura2.png')">
+    <!-- Adicione mais aqui -->
+  </div>
+
+  <div id="botoes">
+    <button onclick="tirarFoto()">📸 Tirar Foto</button>
+    <button onclick="compartilhar()">📤 WhatsApp</button>
+  </div>
+
+  <canvas id="canvas" style="display:none;"></canvas>
+
   <script>
-    let video = document.getElementById('video');
-    let canvas = document.getElementById('canvas');
-    let context = canvas.getContext('2d');
-    let moldura = document.getElementById('moldura');
-    let streamAtual;
-    let usandoFrontal = true;
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const moldura = document.getElementById('moldura');
 
-    async function iniciarCamera(frontal = true) {
-      if (streamAtual) {
-        streamAtual.getTracks().forEach(track => track.stop());
-      }
-
-      const constraints = {
-        video: {
-          facingMode: frontal ? 'user' : 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      };
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        streamAtual = stream;
+    // Iniciar câmera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
+      .then(stream => {
         video.srcObject = stream;
-      } catch (err) {
-        alert('Erro ao acessar a câmera: ' + err.message);
-      }
-    }
-
-    function trocarCamera() {
-      usandoFrontal = !usandoFrontal;
-      iniciarCamera(usandoFrontal);
-    }
+      })
+      .catch(err => {
+        alert("Erro ao acessar câmera: " + err);
+      });
 
     function tirarFoto() {
+      const context = canvas.getContext('2d');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const imgMoldura = new Image();
-      imgMoldura.src = moldura.src;
-
-      imgMoldura.onload = () => {
-        context.drawImage(imgMoldura, 0, 0, canvas.width, canvas.height);
+      const img = new Image();
+      img.src = moldura.src;
+      img.onload = () => {
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
         const link = document.createElement('a');
-        link.download = 'foto_com_moldura.png';
         link.href = canvas.toDataURL('image/png');
+        link.download = 'foto-com-moldura.png';
         link.click();
       };
     }
 
-    function trocarMoldura(nomeArquivo) {
-      moldura.src = nomeArquivo;
+    function trocarMoldura(nome) {
+      moldura.src = nome;
     }
 
-    iniciarCamera();
+    function compartilhar() {
+      const dataURL = canvas.toDataURL("image/png");
+      const blob = dataURItoBlob(dataURL);
+      const file = new File([blob], "foto.png", { type: "image/png" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: "Aghatta XV",
+          text: "Olha minha foto com a moldura da Aghatta 💙👑",
+        });
+      } else {
+        alert("Seu navegador não permite compartilhar arquivos via WhatsApp.");
+      }
+    }
+
+    function dataURItoBlob(dataURI) {
+      const byteString = atob(dataURI.split(',')[1]);
+      const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ab], { type: mimeString });
+    }
   </script>
 </body>
 </html>
