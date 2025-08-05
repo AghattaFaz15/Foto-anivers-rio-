@@ -10,8 +10,8 @@
     body {
       margin: 0;
       background: #000;
-      overflow: hidden;
       font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
     }
 
     #camera-container {
@@ -43,28 +43,29 @@
     }
 
     .botoes {
-      position: absolute;
+      position: fixed;
       bottom: 10px;
+      left: 0;
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      z-index: 3;
-      padding: 0 10px;
+      z-index: 4;
+      padding: 10px;
     }
 
     button {
-      width: 100%;
+      width: 90%;
       max-width: 300px;
       background-color: #3B5BFF;
       color: white;
       border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 17px;
       font-weight: bold;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       cursor: pointer;
     }
 
@@ -127,17 +128,24 @@
 
     function tirarFoto() {
       const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+
+      canvas.width = width;
+      canvas.height = height;
       const context = canvas.getContext('2d');
 
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // Desenha o vídeo
+      context.drawImage(video, 0, 0, width, height);
 
+      // Desenha a moldura por cima
       const molduraAtual = molduras[indexMoldura];
       const img = new Image();
       img.src = molduraAtual.src;
       img.onload = () => {
-        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0, width, height);
+
+        // Salva a imagem
         const imagemURL = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = imagemURL;
