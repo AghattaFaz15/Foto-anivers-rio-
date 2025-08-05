@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <title>Aghatta faz XV - Foto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -44,29 +43,29 @@
 
     .botoes {
       position: absolute;
-      bottom: 15px;
+      bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      flex-direction: row;
-      gap: 12px;
       flex-wrap: wrap;
+      gap: 10px;
       justify-content: center;
       z-index: 3;
-      padding: 0 10px;
+      padding: 10px;
     }
 
     button {
       background-color: #3544a7;
       color: white;
       border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
       font-size: 15px;
       font-weight: bold;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
+      min-width: 120px;
     }
 
     button:hover {
@@ -82,11 +81,13 @@
   <div id="camera-container">
     <video id="video" autoplay playsinline></video>
 
+    <!-- Molduras -->
     <img class="moldura" id="moldura1" src="moldura.png" style="display: block;">
     <img class="moldura" id="moldura2" src="moldura2.png">
     <img class="moldura" id="moldura3" src="moldura3.png">
     <img class="moldura" id="moldura4" src="moldura4.png">
 
+    <!-- Botões -->
     <div class="botoes">
       <button onclick="tirarFoto()">📸 Tirar Foto</button>
       <button onclick="trocarCamera()">🔁 Trocar Câmera</button>
@@ -131,18 +132,23 @@
     }
 
     function tirarFoto() {
-      const videoAspectRatio = video.videoWidth / video.videoHeight;
       const canvas = document.createElement('canvas');
       canvas.width = 1080;
       canvas.height = 1920;
       const context = canvas.getContext('2d');
 
-      let drawWidth = canvas.width;
-      let drawHeight = canvas.width / videoAspectRatio;
-      if (drawHeight > canvas.height) {
+      const videoAspectRatio = video.videoWidth / video.videoHeight;
+      const canvasAspectRatio = canvas.width / canvas.height;
+
+      let drawWidth, drawHeight;
+      if (videoAspectRatio > canvasAspectRatio) {
         drawHeight = canvas.height;
         drawWidth = canvas.height * videoAspectRatio;
+      } else {
+        drawWidth = canvas.width;
+        drawHeight = canvas.width / videoAspectRatio;
       }
+
       const offsetX = (canvas.width - drawWidth) / 2;
       const offsetY = (canvas.height - drawHeight) / 2;
 
