@@ -36,6 +36,7 @@
       width: 100vw;
       height: 100vh;
       z-index: 2;
+      pointer-events: none;
     }
 
     .botoes {
@@ -70,7 +71,7 @@
     <video id="video" autoplay playsinline></video>
 
     <!-- Moldura PNG por cima -->
-    <img class="moldura" src="moldura1.png" alt="Moldura Aghatta faz XV" />
+    <img class="moldura" src="moldura.png" alt="Moldura Aghatta faz XV" />
 
     <!-- Botões -->
     <div class="botoes">
@@ -124,3 +125,10 @@
   </script>
 </body>
 </html>
+"""
+
+# Salvar o HTML como arquivo corrigido
+with open("/mnt/data/foto_com_moldura_corrigida.html", "w", encoding="utf-8") as f:
+    f.write(html_corrigido)
+
+"/mnt/data/foto_com_moldura_corrigida.html"
