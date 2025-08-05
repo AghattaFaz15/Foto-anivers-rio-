@@ -1,151 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Moldura Aghatta XV</title>
+  <meta charset="UTF-8">
+  <title>Aghatta faz XV - Foto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * {
-      margin: 0; padding: 0;
-      box-sizing: border-box;
-    }
-
-    html, body {
-      height: 100%;
-      overflow: hidden;
+    body {
+      margin: 0;
       background: #000;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
     }
 
-    video {
-      position: absolute;
-      top: 0; left: 0;
+    #camera-container {
+      position: relative;
       width: 100vw;
       height: 100vh;
+    }
+
+    video#video {
+      position: absolute;
+      top: 24%;
+      left: 9%;
+      width: 82%;
+      height: 53%;
       object-fit: cover;
+      border-radius: 15px;
       z-index: 1;
-
-      filter: none !important;
-      background: transparent;
-      will-change: transform;
-      transform: translateZ(0);
     }
 
-    #moldura {
+    img.moldura {
       position: absolute;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: contain;
       z-index: 2;
-      pointer-events: none;
     }
 
-    #botoes {
-      position: fixed;
+    .botoes {
+      position: absolute;
       bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 3;
+      width: 100%;
       display: flex;
-      gap: 10px;
+      justify-content: center;
+      gap: 20px;
+      z-index: 3;
     }
 
     button {
-      padding: 10px 16px;
-      font-size: 14px;
-      border-radius: 10px;
-      border: none;
-      background: royalblue;
+      background-color: #3B5BFF;
       color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 16px;
       font-weight: bold;
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
-    button:hover {
-      background: #4169e1;
-    }
-
-    canvas {
-      display: none;
+    button:active {
+      transform: scale(0.97);
     }
   </style>
 </head>
 <body>
+  <div id="camera-container">
+    <!-- Câmera em vídeo -->
+    <video id="video" autoplay playsinline></video>
 
-  <video id="video" autoplay playsinline></video>
-  <img id="moldura" src="moldura2.png" alt="Moldura Aghatta">
+    <!-- Moldura PNG por cima -->
+    <img class="moldura" src="moldura1.png" alt="Moldura Aghatta faz XV" />
 
-  <div id="botoes">
-    <button onclick="tirarFoto()">📸 Tirar Foto</button>
-    <button onclick="trocarCamera()">🔄 Trocar Câmera</button>
+    <!-- Botões -->
+    <div class="botoes">
+      <button onclick="tirarFoto()">📸 Tirar Foto</button>
+      <button onclick="trocarCamera()">🔁 Trocar Câmera</button>
+    </div>
   </div>
 
-  <canvas id="canvas"></canvas>
-
   <script>
-    let usandoFrontal = false;
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const moldura = document.getElementById('moldura');
+    let video = document.getElementById('video');
+    let currentStream;
+    let usingFront = true;
 
     async function iniciarCamera() {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
+
       const constraints = {
         video: {
-          facingMode: usandoFrontal ? "user" : "environment"
-        },
-        audio: false
+          facingMode: usingFront ? 'user' : 'environment'
+        }
       };
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
+        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = currentStream;
       } catch (err) {
-        alert("Erro ao acessar a câmera: " + err);
+        alert('Erro ao acessar câmera: ' + err);
       }
     }
 
     function trocarCamera() {
-      usandoFrontal = !usandoFrontal;
-      if (video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
-      }
+      usingFront = !usingFront;
       iniciarCamera();
     }
 
     function tirarFoto() {
-      if (!video.videoWidth || !video.videoHeight) {
-        alert("Aguarde a câmera carregar totalmente.");
-        return;
-      }
-
+      const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imagemURL = canvas.toDataURL('image/png');
 
-      const ctx = canvas.getContext('2d');
-
-      // Captura o vídeo
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Carrega a moldura
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = moldura.src;
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL("image/png");
-        link.download = "foto-aghatta.png";
-        link.click();
-      };
-      img.onerror = () => {
-        alert("Erro ao carregar a moldura.");
-      };
+      const novaJanela = window.open();
+      novaJanela.document.write('<img src="' + imagemURL + '" style="width:100%;">');
     }
 
-    // Iniciar a câmera ao carregar
     iniciarCamera();
   </script>
 </body>
