@@ -5,6 +5,8 @@
   <title>Aghatta faz XV - Foto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       background: #000;
@@ -42,20 +44,23 @@
 
     .botoes {
       position: absolute;
-      bottom: 20px;
+      bottom: 10px;
       width: 100%;
       display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 15px;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
       z-index: 3;
+      padding: 0 10px;
     }
 
     button {
+      width: 100%;
+      max-width: 300px;
       background-color: #3B5BFF;
       color: white;
       border: none;
-      padding: 12px 18px;
+      padding: 12px;
       border-radius: 10px;
       font-size: 16px;
       font-weight: bold;
@@ -70,16 +75,13 @@
 </head>
 <body>
   <div id="camera-container">
-    <!-- Câmera em vídeo -->
     <video id="video" autoplay playsinline></video>
 
-    <!-- Molduras alternáveis -->
     <img class="moldura" id="moldura1" src="moldura.png" style="display: block;">
     <img class="moldura" id="moldura2" src="moldura2.png">
     <img class="moldura" id="moldura3" src="moldura3.png">
     <img class="moldura" id="moldura4" src="moldura4.png">
 
-    <!-- Botões -->
     <div class="botoes">
       <button onclick="tirarFoto()">📸 Tirar Foto</button>
       <button onclick="trocarCamera()">🔁 Trocar Câmera</button>
@@ -128,11 +130,20 @@
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       const context = canvas.getContext('2d');
+
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const imagemURL = canvas.toDataURL('image/png');
-      const novaJanela = window.open();
-      novaJanela.document.write('<img src="' + imagemURL + '" style="width:100%;">');
+      const molduraAtual = molduras[indexMoldura];
+      const img = new Image();
+      img.src = molduraAtual.src;
+      img.onload = () => {
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const imagemURL = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = imagemURL;
+        link.download = 'foto_aghatta_xv.png';
+        link.click();
+      };
     }
 
     function trocarMoldura() {
@@ -145,4 +156,3 @@
   </script>
 </body>
 </html>
-"""
