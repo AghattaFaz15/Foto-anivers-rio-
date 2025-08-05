@@ -37,6 +37,7 @@
       height: 100vh;
       z-index: 2;
       pointer-events: none;
+      display: none;
     }
 
     .botoes {
@@ -45,7 +46,8 @@
       width: 100%;
       display: flex;
       justify-content: center;
-      gap: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
       z-index: 3;
     }
 
@@ -58,6 +60,7 @@
       font-size: 16px;
       font-weight: bold;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      cursor: pointer;
     }
 
     button:active {
@@ -70,13 +73,17 @@
     <!-- Câmera em vídeo -->
     <video id="video" autoplay playsinline></video>
 
-    <!-- Moldura PNG por cima -->
-    <img class="moldura" src="moldura.png" alt="Moldura Aghatta faz XV" />
+    <!-- Molduras alternáveis -->
+    <img class="moldura" id="moldura1" src="moldura.png" style="display: block;">
+    <img class="moldura" id="moldura2" src="moldura2.png">
+    <img class="moldura" id="moldura3" src="moldura3.png">
+    <img class="moldura" id="moldura4" src="moldura4.png">
 
     <!-- Botões -->
     <div class="botoes">
       <button onclick="tirarFoto()">📸 Tirar Foto</button>
       <button onclick="trocarCamera()">🔁 Trocar Câmera</button>
+      <button onclick="trocarMoldura()">✨ Trocar Moldura</button>
     </div>
   </div>
 
@@ -84,6 +91,13 @@
     let video = document.getElementById('video');
     let currentStream;
     let usingFront = true;
+    let molduras = [
+      document.getElementById('moldura1'),
+      document.getElementById('moldura2'),
+      document.getElementById('moldura3'),
+      document.getElementById('moldura4')
+    ];
+    let indexMoldura = 0;
 
     async function iniciarCamera() {
       if (currentStream) {
@@ -115,10 +129,16 @@
       canvas.height = video.videoHeight;
       const context = canvas.getContext('2d');
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imagemURL = canvas.toDataURL('image/png');
 
+      const imagemURL = canvas.toDataURL('image/png');
       const novaJanela = window.open();
       novaJanela.document.write('<img src="' + imagemURL + '" style="width:100%;">');
+    }
+
+    function trocarMoldura() {
+      molduras[indexMoldura].style.display = 'none';
+      indexMoldura = (indexMoldura + 1) % molduras.length;
+      molduras[indexMoldura].style.display = 'block';
     }
 
     iniciarCamera();
@@ -126,9 +146,3 @@
 </body>
 </html>
 """
-
-# Salvar o HTML como arquivo corrigido
-with open("/mnt/data/foto_com_moldura_corrigida.html", "w", encoding="utf-8") as f:
-    f.write(html_corrigido)
-
-"/mnt/data/foto_com_moldura_corrigida.html"
