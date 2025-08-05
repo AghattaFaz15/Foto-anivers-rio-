@@ -47,34 +47,46 @@
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
+      flex-direction: row;
+      gap: 12px;
       z-index: 3;
       padding: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
-    button {
+    .botao {
       background-color: #3544a7;
       color: white;
       border: none;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 15px;
+      width: 100px;
+      height: 100px;
+      border-radius: 20px;
+      font-size: 14px;
       font-weight: bold;
       box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
       transition: all 0.3s ease;
-      min-width: 120px;
     }
 
-    button:hover {
+    .botao:hover {
       background-color: #4b5fe2;
     }
 
-    button:active {
+    .botao:active {
       transform: scale(0.96);
     }
+
+    .botao span {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
   </style>
 </head>
 <body>
@@ -89,9 +101,18 @@
 
     <!-- Botões -->
     <div class="botoes">
-      <button onclick="tirarFoto()">📸 Tirar Foto</button>
-      <button onclick="trocarCamera()">🔁 Trocar Câmera</button>
-      <button onclick="trocarMoldura()">✨ Trocar Moldura</button>
+      <button class="botao" onclick="tirarFoto()">
+        <span>📸</span>
+        Foto
+      </button>
+      <button class="botao" onclick="trocarCamera()">
+        <span>🔁</span>
+        Câmera
+      </button>
+      <button class="botao" onclick="trocarMoldura()">
+        <span>✨</span>
+        Moldura
+      </button>
     </div>
   </div>
 
