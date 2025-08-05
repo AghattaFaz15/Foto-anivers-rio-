@@ -2,159 +2,169 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Foto Aniversário - Aghatta XV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Foto com Moldura</title>
   <style>
-    * {
+    body {
       margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      font-family: sans-serif;
+      background: #000;
+      overflow-x: hidden;
     }
-    body, html {
+
+    #container {
+      position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      font-family: sans-serif;
-      background-color: #000;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
     }
-    #video-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-    video, canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
+
+    video {
       width: 100%;
-      height: 100%;
+      height: auto;
+      max-height: 100vh;
       object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
     }
-    .moldura {
+
+    #moldura {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
+      max-height: 100vh;
+      z-index: 2;
       pointer-events: none;
     }
-    #controls {
+
+    #botoes {
       position: absolute;
-      bottom: 20px;
+      bottom: 10px;
       width: 100%;
       display: flex;
-      justify-content: center;
-      gap: 10px;
-      z-index: 10;
+      justify-content: space-around;
+      z-index: 3;
     }
+
     button {
-      padding: 10px 20px;
-      font-size: 16px;
+      background: #fff;
       border: none;
-      border-radius: 8px;
-      background-color: royalblue;
-      color: white;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 16px;
       font-weight: bold;
+      box-shadow: 0 0 10px #0008;
       cursor: pointer;
     }
-    .thumbs {
+
+    #molduras {
       position: absolute;
       top: 10px;
       left: 10px;
       display: flex;
       gap: 10px;
-      z-index: 10;
+      z-index: 4;
     }
-    .thumbs img {
+
+    .opcao-moldura {
       width: 60px;
       height: 60px;
+      object-fit: cover;
       border: 2px solid white;
-      border-radius: 6px;
+      border-radius: 10px;
       cursor: pointer;
+      box-shadow: 0 0 5px #000;
+    }
+
+    canvas {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div id="video-container">
+  <div id="container">
     <video id="video" autoplay playsinline></video>
+    <img id="moldura" src="moldura.png" alt="Moldura" />
+    
+    <div id="molduras">
+      <img src="moldura.png" class="opcao-moldura" onclick="trocarMoldura('moldura.png')" />
+      <img src="moldura2.png" class="opcao-moldura" onclick="trocarMoldura('moldura2.png')" />
+      <img src="moldura3.png" class="opcao-moldura" onclick="trocarMoldura('moldura3.png')" />
+    </div>
+
+    <div id="botoes">
+      <button onclick="tirarFoto()">📸 Tirar Foto</button>
+      <button onclick="trocarCamera()">🔄 Trocar Câmera</button>
+    </div>
+
     <canvas id="canvas"></canvas>
-    <img src="moldura.png" id="moldura" class="moldura" />
-
-    <div class="thumbs">
-      <img src="moldura.png" onclick="setMoldura('moldura.png')">
-      <img src="moldura2.png" onclick="setMoldura('moldura2.png')">
-    </div>
-
-    <div id="controls">
-      <button onclick="trocarCamera()">Trocar Câmera</button>
-      <button onclick="tirarFoto()">Capturar</button>
-    </div>
   </div>
 
   <script>
     let video = document.getElementById('video');
     let canvas = document.getElementById('canvas');
     let context = canvas.getContext('2d');
-    let currentStream;
-    let useFrontCamera = true;
+    let moldura = document.getElementById('moldura');
+    let streamAtual;
+    let usandoFrontal = true;
 
-    function iniciarCamera() {
-      if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
+    async function iniciarCamera(frontal = true) {
+      if (streamAtual) {
+        streamAtual.getTracks().forEach(track => track.stop());
       }
+
       const constraints = {
         video: {
-          facingMode: useFrontCamera ? 'user' : 'environment'
+          facingMode: frontal ? 'user' : 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         }
       };
 
-      navigator.mediaDevices.getUserMedia(constraints)
-        .then(stream => {
-          currentStream = stream;
-          video.srcObject = stream;
-        })
-        .catch(error => {
-          console.error("Erro ao acessar a câmera:", error);
-        });
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        streamAtual = stream;
+        video.srcObject = stream;
+      } catch (err) {
+        alert('Erro ao acessar a câmera: ' + err.message);
+      }
     }
 
     function trocarCamera() {
-      useFrontCamera = !useFrontCamera;
-      iniciarCamera();
+      usandoFrontal = !usandoFrontal;
+      iniciarCamera(usandoFrontal);
     }
 
     function tirarFoto() {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
-      // Desenha vídeo
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Desenha moldura sobre o vídeo
-      let moldura = document.getElementById('moldura');
-      let img = new Image();
-      img.src = moldura.src;
-      img.onload = function() {
-        context.drawImage(img, 0, 0, canvas.width, canvas.height);
-        let foto = canvas.toDataURL('image/png');
+      const imgMoldura = new Image();
+      imgMoldura.src = moldura.src;
 
-        // Cria download automático
-        let a = document.createElement('a');
-        a.href = foto;
-        a.download = 'foto-aniversario.png';
-        a.click();
+      imgMoldura.onload = () => {
+        context.drawImage(imgMoldura, 0, 0, canvas.width, canvas.height);
+        const link = document.createElement('a');
+        link.download = 'foto_com_moldura.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
       };
     }
 
-    function setMoldura(src) {
-      document.getElementById('moldura').src = src;
+    function trocarMoldura(nomeArquivo) {
+      moldura.src = nomeArquivo;
     }
 
-    window.onload = iniciarCamera;
+    iniciarCamera();
   </script>
 </body>
 </html>
