@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Aghatta faz XV - Foto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      margin: 0;
       background: #000;
       overflow: hidden;
       font-family: 'Segoe UI', sans-serif;
@@ -28,7 +27,6 @@
       height: 100%;
       object-fit: cover;
       z-index: 1;
-      transform: scaleX(1);
     }
 
     img.moldura {
@@ -44,121 +42,57 @@
 
     .botoes {
       position: absolute;
-      bottom: 40px;
+      bottom: 15px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      flex-direction: row;
-      gap: 8px;
-      z-index: 3;
-      padding: 10px;
       flex-wrap: wrap;
       justify-content: center;
+      gap: 10px;
+      z-index: 3;
     }
 
-    .botao {
+    button {
+      width: 100px;
+      height: 100px;
       background-color: #3544a7;
       color: white;
       border: none;
-      width: 80px;
-      height: 80px;
-      border-radius: 16px;
-      font-size: 12px;
+      border-radius: 12px;
+      font-size: 13px;
       font-weight: bold;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-      cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: 0.3s ease;
       text-align: center;
-      transition: all 0.3s ease;
     }
 
-    .botao:hover {
+    button:hover {
       background-color: #4b5fe2;
     }
 
-    .botao:active {
+    button:active {
       transform: scale(0.96);
     }
-
-    .botao span {
-      font-size: 18px;
-      margin-bottom: 4px;
-    }
-
-    #modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      z-index: 999;
-      padding: 20px;
-    }
-
-    #modal img {
-      max-width: 100%;
-      max-height: 70vh;
-      border: 5px solid white;
-      border-radius: 12px;
-      margin-bottom: 20px;
-    }
-
-    .modal-botoes {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .modal-botoes button {
-      padding: 10px 16px;
-      font-size: 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      color: white;
-    }
-
-    .modal-botoes .fechar { background-color: #888; }
-    .modal-botoes .excluir { background-color: #d9534f; }
-    .modal-botoes .compartilhar { background-color: #28a745; }
   </style>
 </head>
 <body>
   <div id="camera-container">
     <video id="video" autoplay playsinline></video>
 
-    <!-- Molduras -->
-    <div id="molduras-container"></div>
+    <img class="moldura" id="moldura1" src="moldura.png" style="display: block;">
+    <img class="moldura" id="moldura2" src="moldura2.png">
+    <img class="moldura" id="moldura3" src="moldura3.png">
+    <img class="moldura" id="moldura4" src="moldura4.png">
 
     <div class="botoes">
-      <button class="botao" onclick="tirarFoto()">
-        <span>📸</span>Foto
-      </button>
-      <button class="botao" onclick="trocarCamera()">
-        <span>🔁</span>Câmera
-      </button>
-      <button class="botao" onclick="trocarMoldura()">
-        <span>✨</span>Moldura
-      </button>
-      <button class="botao" onclick="abrirGaleria()">
-        <span>🖼️</span>Galeria
-      </button>
-    </div>
-  </div>
-
-  <div id="modal">
-    <img id="modal-img" src="">
-    <div class="modal-botoes">
-      <button class="fechar" onclick="fecharModal()">Fechar</button>
-      <button class="excluir" onclick="excluirFoto()">Excluir</button>
-      <button class="compartilhar" onclick="compartilharFoto()">Compartilhar</button>
+      <button onclick="tirarFoto()">📸<br>Foto</button>
+      <button onclick="trocarCamera()">🔁<br>Câmera</button>
+      <button onclick="trocarMoldura()">✨<br>Moldura</button>
     </div>
   </div>
 
@@ -166,23 +100,13 @@
     let video = document.getElementById('video');
     let currentStream;
     let usingFront = true;
-    let molduras = [];
+    let molduras = [
+      document.getElementById('moldura1'),
+      document.getElementById('moldura2'),
+      document.getElementById('moldura3'),
+      document.getElementById('moldura4')
+    ];
     let indexMoldura = 0;
-    let ultimaFotoURL = '';
-
-    const totalMolduras = 10; // aumente esse número conforme seu uso
-
-    window.onload = () => {
-      const container = document.getElementById('molduras-container');
-      for (let i = 1; i <= totalMolduras; i++) {
-        const img = document.createElement('img');
-        img.src = `moldura${i}.png`;
-        img.className = 'moldura';
-        if (i === 1) img.style.display = 'block';
-        container.appendChild(img);
-        molduras.push(img);
-      }
-    }
 
     async function iniciarCamera() {
       if (currentStream) {
@@ -191,6 +115,8 @@
 
       const constraints = {
         video: {
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
           facingMode: usingFront ? 'user' : 'environment'
         }
       };
@@ -198,7 +124,6 @@
       try {
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
-        video.style.transform = 'scaleX(1)';
       } catch (err) {
         alert('Erro ao acessar câmera: ' + err);
       }
@@ -210,21 +135,17 @@
     }
 
     function tirarFoto() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 1080;
-      canvas.height = 1920;
-      const context = canvas.getContext('2d');
-
       const videoAspectRatio = video.videoWidth / video.videoHeight;
-      const canvasAspectRatio = canvas.width / canvas.height;
+      const canvas = document.createElement('canvas');
+      canvas.width = 2160;  // ⬆️ Resolução aumentada
+      canvas.height = 3840;
 
-      let drawWidth, drawHeight;
-      if (videoAspectRatio > canvasAspectRatio) {
+      const context = canvas.getContext('2d');
+      let drawWidth = canvas.width;
+      let drawHeight = canvas.width / videoAspectRatio;
+      if (drawHeight > canvas.height) {
         drawHeight = canvas.height;
         drawWidth = canvas.height * videoAspectRatio;
-      } else {
-        drawWidth = canvas.width;
-        drawHeight = canvas.width / videoAspectRatio;
       }
 
       const offsetX = (canvas.width - drawWidth) / 2;
@@ -240,8 +161,10 @@
       img.onload = () => {
         context.drawImage(img, 0, 0, canvas.width, canvas.height);
         const imagemURL = canvas.toDataURL('image/png');
-        ultimaFotoURL = imagemURL;
-        mostrarModal(imagemURL);
+        const link = document.createElement('a');
+        link.href = imagemURL;
+        link.download = 'foto_aghatta_xv.png';
+        link.click();
       };
     }
 
@@ -249,46 +172,6 @@
       molduras[indexMoldura].style.display = 'none';
       indexMoldura = (indexMoldura + 1) % molduras.length;
       molduras[indexMoldura].style.display = 'block';
-    }
-
-    function mostrarModal(url) {
-      const modal = document.getElementById('modal');
-      const img = document.getElementById('modal-img');
-      img.src = url;
-      modal.style.display = 'flex';
-    }
-
-    function fecharModal() {
-      document.getElementById('modal').style.display = 'none';
-    }
-
-    function excluirFoto() {
-      if (confirm('Tem certeza que deseja excluir?')) {
-        ultimaFotoURL = '';
-        fecharModal();
-      }
-    }
-
-    function compartilharFoto() {
-      if (navigator.share) {
-        fetch(ultimaFotoURL)
-          .then(res => res.blob())
-          .then(blob => {
-            const file = new File([blob], 'foto_aghatta_xv.png', { type: 'image/png' });
-            navigator.share({
-              title: 'Aghatta XV',
-              text: 'Olha essa foto linda!',
-              files: [file]
-            });
-          })
-          .catch(err => alert('Erro ao compartilhar: ' + err));
-      } else {
-        alert('Seu navegador n\u00e3o suporta compartilhamento direto.');
-      }
-    }
-
-    function abrirGaleria() {
-      alert('Galeria em constru\u00e7\u00e3o! Em breve voc\u00ea ver\u00e1 todas as fotos lindas \ud83d\udc96');
     }
 
     iniciarCamera();
