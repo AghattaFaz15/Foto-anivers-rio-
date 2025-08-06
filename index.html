@@ -42,41 +42,47 @@
 
     .botoes {
       position: absolute;
-      bottom: 15px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
+      gap: 15px;
       z-index: 3;
     }
 
     button {
-      width: 100px;
-      height: 100px;
-      background-color: #3544a7;
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(to bottom right, #001F54, #FFD700);
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 16px;
       font-size: 13px;
       font-weight: bold;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       cursor: pointer;
       transition: 0.3s ease;
       text-align: center;
     }
 
     button:hover {
-      background-color: #4b5fe2;
+      transform: scale(1.05);
+      box-shadow: 0 0 12px #FFD700;
     }
 
     button:active {
-      transform: scale(0.96);
+      transform: scale(0.95);
+    }
+
+    button span {
+      font-size: 22px;
+      margin-bottom: 4px;
     }
   </style>
 </head>
@@ -90,9 +96,15 @@
     <img class="moldura" id="moldura4" src="moldura4.png">
 
     <div class="botoes">
-      <button onclick="tirarFoto()">📸<br>Foto</button>
-      <button onclick="trocarCamera()">🔁<br>Câmera</button>
-      <button onclick="trocarMoldura()">✨<br>Moldura</button>
+      <button onclick="tirarFoto()">
+        <span>📸</span>Foto
+      </button>
+      <button onclick="trocarCamera()">
+        <span>🔁</span>Câmera
+      </button>
+      <button onclick="trocarMoldura()">
+        <span>✨</span>Moldura
+      </button>
     </div>
   </div>
 
@@ -137,7 +149,7 @@
     function tirarFoto() {
       const videoAspectRatio = video.videoWidth / video.videoHeight;
       const canvas = document.createElement('canvas');
-      canvas.width = 2160;  // ⬆️ Resolução aumentada
+      canvas.width = 2160;
       canvas.height = 3840;
 
       const context = canvas.getContext('2d');
