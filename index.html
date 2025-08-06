@@ -5,7 +5,11 @@
   <title>Aghatta faz XV - Foto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       background: #000;
@@ -46,10 +50,11 @@
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: row;
       justify-content: center;
-      gap: 15px;
+      gap: 12px;
       z-index: 3;
+      flex-wrap: nowrap;
     }
 
     button {
@@ -84,6 +89,13 @@
       font-size: 22px;
       margin-bottom: 4px;
     }
+
+    @media (max-width: 420px) {
+      .botoes {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -94,6 +106,8 @@
     <img class="moldura" id="moldura2" src="moldura2.png">
     <img class="moldura" id="moldura3" src="moldura3.png">
     <img class="moldura" id="moldura4" src="moldura4.png">
+    <img class="moldura" id="moldura5" src="moldura5.png">
+    <img class="moldura" id="moldura6" src="moldura6.png">
 
     <div class="botoes">
       <button onclick="tirarFoto()">
