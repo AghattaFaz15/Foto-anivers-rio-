@@ -28,7 +28,7 @@
       height: 100%;
       object-fit: cover;
       z-index: 1;
-      transform: scaleX(1); /* evita efeito espelho */
+      transform: scaleX(1);
     }
 
     img.moldura {
@@ -88,7 +88,6 @@
       margin-bottom: 4px;
     }
 
-    /* Modal */
     #modal {
       position: fixed;
       top: 0; left: 0;
@@ -129,7 +128,6 @@
     .modal-botoes .fechar { background-color: #888; }
     .modal-botoes .excluir { background-color: #d9534f; }
     .modal-botoes .compartilhar { background-color: #28a745; }
-
   </style>
 </head>
 <body>
@@ -137,33 +135,24 @@
     <video id="video" autoplay playsinline></video>
 
     <!-- Molduras -->
-    <img class="moldura" id="moldura1" src="moldura.png" style="display: block;">
-    <img class="moldura" id="moldura2" src="moldura2.png">
-    <img class="moldura" id="moldura3" src="moldura3.png">
-    <img class="moldura" id="moldura4" src="moldura4.png">
+    <div id="molduras-container"></div>
 
-    <!-- Botões -->
     <div class="botoes">
       <button class="botao" onclick="tirarFoto()">
-        <span>📸</span>
-        Foto
+        <span>📸</span>Foto
       </button>
       <button class="botao" onclick="trocarCamera()">
-        <span>🔁</span>
-        Câmera
+        <span>🔁</span>Câmera
       </button>
       <button class="botao" onclick="trocarMoldura()">
-        <span>✨</span>
-        Moldura
+        <span>✨</span>Moldura
       </button>
       <button class="botao" onclick="abrirGaleria()">
-        <span>🖼️</span>
-        Galeria
+        <span>🖼️</span>Galeria
       </button>
     </div>
   </div>
 
-  <!-- Modal -->
   <div id="modal">
     <img id="modal-img" src="">
     <div class="modal-botoes">
@@ -177,14 +166,23 @@
     let video = document.getElementById('video');
     let currentStream;
     let usingFront = true;
-    let molduras = [
-      document.getElementById('moldura1'),
-      document.getElementById('moldura2'),
-      document.getElementById('moldura3'),
-      document.getElementById('moldura4')
-    ];
+    let molduras = [];
     let indexMoldura = 0;
     let ultimaFotoURL = '';
+
+    const totalMolduras = 10; // aumente esse número conforme seu uso
+
+    window.onload = () => {
+      const container = document.getElementById('molduras-container');
+      for (let i = 1; i <= totalMolduras; i++) {
+        const img = document.createElement('img');
+        img.src = `moldura${i}.png`;
+        img.className = 'moldura';
+        if (i === 1) img.style.display = 'block';
+        container.appendChild(img);
+        molduras.push(img);
+      }
+    }
 
     async function iniciarCamera() {
       if (currentStream) {
@@ -200,14 +198,7 @@
       try {
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
-
-        // remove espelho:
-        if (usingFront) {
-          video.style.transform = 'scaleX(1)';
-        } else {
-          video.style.transform = 'scaleX(1)';
-        }
-
+        video.style.transform = 'scaleX(1)';
       } catch (err) {
         alert('Erro ao acessar câmera: ' + err);
       }
@@ -292,12 +283,12 @@
           })
           .catch(err => alert('Erro ao compartilhar: ' + err));
       } else {
-        alert('Seu navegador não suporta compartilhamento direto.');
+        alert('Seu navegador n\u00e3o suporta compartilhamento direto.');
       }
     }
 
     function abrirGaleria() {
-      alert('Galeria em construção! Em breve você verá todas as fotos lindas 💖');
+      alert('Galeria em constru\u00e7\u00e3o! Em breve voc\u00ea ver\u00e1 todas as fotos lindas \ud83d\udc96');
     }
 
     iniciarCamera();
